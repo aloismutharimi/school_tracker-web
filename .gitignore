@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+
+# Data (each school has its own)
+data/
+reports/
+
+# Environment
+.env
+
+# Editor
+.vscode/
+.idea/
