@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "school-tracker-web"
+version = "0.1.0"
+description = "Web interface for the School Fees & Results Tracker"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "flask",
+    "school-tracker @ file:///D:/myportfolio/school_tracker",
+]
+
+[project.scripts]
+school-tracker-web = "app:main"
+
+[tool.setuptools]
+py-modules = ["app"]
