@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "flask",
-    "school-tracker @ file:///D:/myportfolio/school_tracker",
+    "school-tracker @ git+https://github.com/aloismutharimi/school_tracker-sys.git",
 ]
 
 [project.scripts]

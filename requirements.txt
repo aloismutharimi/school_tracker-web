@@ -1,2 +1,2 @@
 flask
-school-tracker @ file:///D:/myportfolio/school_tracker
+school-tracker @ git+https://github.com/aloismutharimi/school_tracker-sys.git
