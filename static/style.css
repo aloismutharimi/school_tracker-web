@@ -11,36 +11,29 @@ body {
 }
 
 /* ---- Header ---- */
-/* ---- Header ---- */
 header {
     background: rgba(15, 30, 52, 0.85);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid rgba(74, 139, 183, 0.15);
-    padding: 0;
+    padding: 1.2rem 2rem 0.8rem;
     position: sticky;
     top: 0;
     z-index: 100;
 }
 
-header .inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 1.1rem 2rem;
+.brand-row {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 0.9rem;
 }
 
 header .brand {
-    font-size: 1.15rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: #fff;
     text-decoration: none;
-    text-shadow: 0 0 20px rgba(74, 139, 183, 0.3);
     letter-spacing: -0.3px;
-    padding-bottom: 3px;
+    padding-bottom: 4px;
     border-bottom: 2px solid #4a8bb7;
     transition: 0.15s;
 }
@@ -49,14 +42,17 @@ header .brand:hover {
     border-bottom-color: #6aabe0;
 }
 
-nav {
+.nav-row {
     display: flex;
+    justify-content: center;
     gap: 0.4rem;
     flex-wrap: wrap;
     align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
-nav a {
+.nav-row a {
     color: #94a3b8;
     text-decoration: none;
     font-size: 0.88rem;
@@ -66,12 +62,12 @@ nav a {
     transition: 0.15s;
 }
 
-nav a:hover {
+.nav-row a:hover {
     color: #fff;
     background: rgba(255, 255, 255, 0.05);
 }
 
-nav a.active {
+.nav-row a.active {
     color: #4a8bb7;
     background: rgba(74, 139, 183, 0.12);
 }
@@ -337,6 +333,19 @@ tr:hover td { background: rgba(255, 255, 255, 0.02); }
     }
 }
 
+@media (max-width: 600px) {
+    header {
+        padding: 1rem 0.8rem 0.6rem;
+    }
+    header .brand {
+        font-size: 1.15rem;
+    }
+    .nav-row a {
+        font-size: 0.82rem;
+        padding: 0.4rem 0.6rem;
+    }
+}
+
 /* ---- Footer ---- */
 footer {
     padding: 1.5rem 2rem;
@@ -353,4 +362,21 @@ footer {
     .stat .value { font-size: 1.3rem; }
     table { font-size: 0.8rem; }
     th, td { padding: 0.5rem 0.6rem; }
+}
+
+/* ---- Center forms ---- */
+.card:has(form.form-grid) {
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.card form.form-grid {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ---- Center form action buttons ---- */
+.card form.form-grid .form-actions {
+    justify-content: center;
 }
