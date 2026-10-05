@@ -10,6 +10,8 @@ dist/
 # Data (each school has its own)
 data/
 reports/
+students-bulk.csv
+populate_test_data.py
 
 # Environment
 .env
