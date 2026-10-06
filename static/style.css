@@ -72,6 +72,76 @@ header .brand:hover {
     background: rgba(74, 139, 183, 0.12);
 }
 
+/* ---- Row actions menu (kebab) ---- */
+.row-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.menu-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    transition: 0.15s;
+    font-family: inherit;
+}
+
+.menu-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.menu-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: #14274a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
+    min-width: 140px;
+    z-index: 50;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.menu-dropdown.open { display: block; }
+
+.menu-dropdown a,
+.menu-dropdown button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.6rem 0.9rem;
+    color: #e8edf2;
+    text-decoration: none;
+    font-size: 0.88rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: 0.12s;
+}
+
+.menu-dropdown a:hover,
+.menu-dropdown button:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.menu-dropdown .menu-delete {
+    color: #f87171;
+}
+
+.menu-dropdown .menu-delete:hover {
+    background: rgba(248, 113, 113, 0.1);
+}
+
 /* ---- Main ---- */
 main {
     flex: 1;

@@ -11,6 +11,8 @@ from school_tracker.tracker import (
     add_student as add_student_record,
     record_payment as record_payment_record,
     record_score as record_score_record,
+    update_student as update_student_record,
+    delete_student as delete_student_record,
 )
 from school_tracker.report import (
     build_finance_table,
@@ -64,16 +66,24 @@ def students():
 
 
 @app.route("/students/new", methods=["GET", "POST"])
-def add_student_view():
+@app.route("/students/<student_id>/edit", methods=["GET", "POST"])
+def add_student_view(student_id=None):
+    editing = student_id is not None
+
+    if editing:
+        student = get_student(student_id)
+        if not student:
+            flash(f"Unknown student {student_id}", "error")
+            return redirect(url_for("students"))
+
     if request.method == "POST":
-        student_id = request.form.get("id", "").strip()
+        new_id = request.form.get("id", "").strip()
         name = request.form.get("name", "").strip()
         student_class = request.form.get("class", "").strip()
         phone = request.form.get("phone", "").strip()
 
-        # Validate
         errors = []
-        if not student_id:
+        if not new_id:
             errors.append("Student ID is required.")
         if not name:
             errors.append("Name is required.")
@@ -85,41 +95,69 @@ def add_student_view():
                 flash(e, "error")
             return render_template(
                 "add_student.html",
-                form={"id": student_id, "name": name,
+                form={"id": new_id, "name": name,
                       "class": student_class, "phone": phone},
                 classes=_known_classes(),
+                editing=editing,
             )
 
-        # Save
         try:
-            add_student_record(student_id, name, student_class, phone)
-            flash(f"Added {name} ({student_id})", "success")
+            if editing:
+                # ID change not supported in v1 — keep the original ID
+                update_student_record(
+                    student_id,
+                    name=name,
+                    student_class=student_class,
+                    guardian_phone=phone,
+                )
+                flash(f"Updated {name} ({student_id})", "success")
+            else:
+                add_student_record(new_id, name, student_class, phone)
+                flash(f"Added {name} ({new_id})", "success")
             return redirect(url_for("students"))
         except ValueError as e:
             flash(str(e), "error")
             return render_template(
                 "add_student.html",
-                form={"id": student_id, "name": name,
+                form={"id": new_id, "name": name,
                       "class": student_class, "phone": phone},
                 classes=_known_classes(),
+                editing=editing,
             )
 
-    # GET — show the form
+    # GET
+    if editing:
+        form = {
+            "id": student_id,
+            "name": student["name"],
+            "class": student["class"],
+            "phone": student.get("guardian_phone", ""),
+        }
+    else:
+        form = {"id": "", "name": "", "class": "", "phone": ""}
+
     return render_template(
         "add_student.html",
-        form={"id": "", "name": "", "class": "", "phone": ""},
+        form=form,
         classes=_known_classes(),
+        editing=editing,
     )
 
 
-def _known_classes():
-    """Return a sorted list of class names already in use, for the dropdown."""
-    students = list_students()
-    classes = sorted({s["class"] for s in students})
-    # Always offer common defaults even if no students yet
-    defaults = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"]
-    merged = sorted(set(classes) | set(defaults))
-    return merged
+@app.route("/students/<student_id>/delete", methods=["POST"])
+def delete_student_view(student_id):
+    student = get_student(student_id)
+    if not student:
+        flash(f"Unknown student {student_id}", "error")
+        return redirect(url_for("students"))
+
+    try:
+        delete_student_record(student_id, remove_records=True)
+        flash(f"Deleted {student['name']} ({student_id}) and all their records", "success")
+    except ValueError as e:
+        flash(str(e), "error")
+
+    return redirect(url_for("students"))
 
 
 @app.route("/payments/new", methods=["GET", "POST"])
@@ -267,41 +305,6 @@ def add_score():
     )
 
 
-def _recent_payments(term, limit=5):
-    """Return the last N payments for the given term, newest first."""
-    payments = load_json("payments.json")
-    filtered = [p for p in payments if p["term"] == term]
-    filtered = filtered[-limit:]
-    filtered.reverse()
-    students = {s["id"]: s for s in list_students()}
-    return [
-        {
-            "student_name": students.get(p["student_id"], {}).get("name", "?"),
-            "amount": p["amount"],
-            "method": p["method"],
-            "date": p["date"],
-        }
-        for p in filtered
-    ]
-
-
-def _recent_scores(term, limit=5):
-    """Return the last N scores for the given term, newest first."""
-    scores = load_json("scores.json")
-    filtered = [s for s in scores if s["term"] == term]
-    filtered = filtered[-limit:]
-    filtered.reverse()
-    students = {s["id"]: s for s in list_students()}
-    return [
-        {
-            "student_name": students.get(s["student_id"], {}).get("name", "?"),
-            "subject": s["subject"],
-            "score": s["score"],
-            "out_of": s["out_of"],
-        }
-        for s in filtered
-    ]
-
 @app.route("/reports", methods=["GET", "POST"])
 def reports():
     term = "2026-T1"
@@ -419,6 +422,7 @@ def _build_report_view(term, mode, students, student_id=None, class_filter=None)
 
     return result
 
+
 @app.route("/reports/download")
 def reports_download():
     term = "2026-T1"
@@ -471,6 +475,50 @@ def reports_download():
 def health():
     return {"status": "ok", "students": len(list_students())}
 
+def _recent_payments(term, limit=5):
+    """Return the last N payments for the given term, newest first."""
+    payments = load_json("payments.json")
+    filtered = [p for p in payments if p["term"] == term]
+    filtered = filtered[-limit:]
+    filtered.reverse()
+    students = {s["id"]: s for s in list_students()}
+    return [
+        {
+            "student_name": students.get(p["student_id"], {}).get("name", "?"),
+            "amount": p["amount"],
+            "method": p["method"],
+            "date": p["date"],
+        }
+        for p in filtered
+    ]
+
+
+def _recent_scores(term, limit=5):
+    """Return the last N scores for the given term, newest first."""
+    scores = load_json("scores.json")
+    filtered = [s for s in scores if s["term"] == term]
+    filtered = filtered[-limit:]
+    filtered.reverse()
+    students = {s["id"]: s for s in list_students()}
+    return [
+        {
+            "student_name": students.get(s["student_id"], {}).get("name", "?"),
+            "subject": s["subject"],
+            "score": s["score"],
+            "out_of": s["out_of"],
+        }
+        for s in filtered
+    ]
+
+def _known_classes():
+    """Return a sorted list of class names already in use, for the dropdown."""
+    students = list_students()
+    classes = sorted({s["class"] for s in students})
+    # Always offer common defaults even if no students yet
+    defaults = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6"]
+    merged = sorted(set(classes) | set(defaults))
+    return merged
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
+

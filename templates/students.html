@@ -22,6 +22,7 @@
                         <th>Guardian Phone</th>
                         <th>Balance</th>
                         <th>Status</th>
+                        <th style="width:60px;"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,6 +42,19 @@
                                 <span class="badge ok">Cleared</span>
                             {% endif %}
                         </td>
+                        <td style="text-align:right;">
+                            <div class="row-menu">
+                                <button type="button" class="menu-btn" onclick="toggleMenu('{{ s.id }}', event)">⋮</button>
+                                <div class="menu-dropdown" id="menu-{{ s.id }}">
+                                    <a href="{{ url_for('add_student_view', student_id=s.id) }}">✎ Edit</a>
+                                    <form method="POST" action="{{ url_for('delete_student_view', student_id=s.id) }}"
+                                          onsubmit="return confirm('Delete {{ s.name }} ({{ s.id }}) and all their payment and score records? This cannot be undone.');"
+                                          style="margin:0;">
+                                        <button type="submit" class="menu-delete">🗑 Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -54,4 +68,20 @@
             </div>
         </div>
     {% endif %}
+
+    <script>
+        function toggleMenu(studentId, event) {
+            event.stopPropagation();
+            const menu = document.getElementById('menu-' + studentId);
+            const isOpen = menu.classList.contains('open');
+            // Close all menus first
+            document.querySelectorAll('.menu-dropdown').forEach(m => m.classList.remove('open'));
+            if (!isOpen) menu.classList.add('open');
+        }
+
+        // Close any open menu when clicking outside
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.menu-dropdown').forEach(m => m.classList.remove('open'));
+        });
+    </script>
 {% endblock %}
