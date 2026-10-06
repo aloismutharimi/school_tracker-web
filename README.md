@@ -2,6 +2,10 @@
 
 A Flask web interface for the [School Fees & Results Tracker](https://github.com/aloismutharimi/school_tracker-sys) — the same engine, browser-based, for administrators who don't use the terminal.
 
+## Live Demo
+
+Try the web interface: [School Tracker](https://school-tracker-web.onrender.com)
+
 ---
 
 ## What It Does
