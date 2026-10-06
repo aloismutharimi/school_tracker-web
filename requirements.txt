@@ -1,4 +1,5 @@
 flask
+gunicorn
 school-tracker @ git+https://github.com/aloismutharimi/school_tracker-sys.git
 
 # For local development with instant feedback, install editable instead:
